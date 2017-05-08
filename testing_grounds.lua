@@ -17,33 +17,26 @@ longsword = item.Weapon:new()
 chainmail = item.Armor:new()
   chainmail.name = "Chainmail Armor"
   chainmail.defense = 3
+bastard_sword = item.Weapon:new()
+  bastard_sword.name = "Bastard Sword"
+  bastard_sword.atk = 2
+  bastard_sword.dmg = 4
 
-player = entity.Entity:new()
-  player.name = "Player"
+player = entity.Player:new()
   player.inventory[1] = longsword
   player.inventory[2] = chainmail
   player.equipped.weapon = player.inventory[1]
   player.equipped.armor = player.inventory[2]
   player:equip_update()
 --
-gerblin_sword = item.Weapon:new()
-  gerblin_sword.name = "Gerblin Sword"
-  gerblin_sword.atk = 1
-  gerblin_sword.dmg = 2
-gerblin_rags = item.Armor:new()
-  gerblin_rags.name = "Gerblin Rags"
-  gerblin_rags.defense = 1
-
-gerblin = entity.Entity:new()
-gerblin.name = "Gerblin"
-gerblin.inventory[1] = gerblin_sword
-gerblin.inventory[2] = gerblin_rags
-gerblin.equipped.weapon = gerblin.inventory[1]
-gerblin.equipped.armor = gerblin.inventory[2]
-gerblin:equip_update()
-
-slime = entity.Entity:new()
-slime.name = "Slime"
+gerblin = entity.Monster:new()
+  gerblin.name = "Gerblin"
+  gerblin.max_hp = 8
+  gerblin.atk = 1
+  gerblin.dmg = 2
+  gerblin.defense = 11
+  gerblin.loot = {bastard_sword, coins = 5}
+  gerblin:monster_update()
 
 test_room = tile.CombatTile:new()
   test_room.monster = gerblin
@@ -53,3 +46,11 @@ test_room = tile.CombatTile:new()
   test_room.rspwn_chance = 50
 
 test_room:enter_tile(player)
+print ("Inventory:")
+for k,v in pairs(player.inventory) do
+  if k == "coins" then
+    print (v.." coins")
+  else
+    print(v.name)
+  end
+end
