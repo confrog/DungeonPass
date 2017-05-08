@@ -41,9 +41,33 @@ function combat.attack(attacker, target, circ)
   end
 end
 --
+function post_fight (player, monster, fight_res)
+  if fight_res == "monster dead" then
+    print("The "..monster.name.." died!")
+    if monster.loot == nil then
+        print("The "..monster.name.." dropped no loot.")
+    else
+      print("The "..monster.name.." dropped:")
+      for k,v in pairs(monster.loot) do
+        if k == "coins" then
+          print (" > "..v.." coins")
+          player.inventory.coins = player.inventory.coins + v
+        else
+          print(" > "..v.name)
+          table.insert(player.inventory, v)
+        end
+      end
+    end
+  else
+    -- insert resolve lost combat code later
+    print("You have died in glorious combat.")
+  end
+end
+--
 function combat.fight(player, monster)
   player_init = combat.d20_roll()
   monster_init = combat.d20_roll()
+  fight_res = nil
   if math.max(player_init, monster_init) == player_init then
     init_order = {player, monster}
   else
@@ -53,7 +77,11 @@ function combat.fight(player, monster)
     print(init_order[1].name.."'s turn")
     combat.attack(init_order[1], init_order[2])
     if init_order[2].hp <= 0 then
-      print(init_order[2].name.." is dead")
+      if init_order[2] == monster then
+        fight_res = "monster dead"
+      else
+        fight_res = "player dead"
+      end
       break
     end
     io.write("-------------------")
@@ -62,7 +90,11 @@ function combat.fight(player, monster)
     print(init_order[2].name.."'s turn")
     combat.attack(init_order[2],init_order[1])
     if init_order[1].hp <= 0 then
-      print(init_order[1].name.." is dead")
+      if init_order[1] == monster then
+        fight_res = "monster dead"
+      else
+        fight_res = "player dead"
+      end
       break
     end
   
@@ -70,6 +102,7 @@ function combat.fight(player, monster)
     io.read()
     combat.sleep(.25)
   end
+  post_fight(player,monster,fight_res)
 end
 --
 return combat
