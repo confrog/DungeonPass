@@ -4,29 +4,23 @@ function p_input()
   return input_value
 end
 --
+require "choices"
+require "abilities"
 require "entity"
 require "item"
 require "combat"
 require "tile"
 --
 --
-longsword = item.Weapon:new()
-  longsword.name = "Longsword"
-  longsword.atk = 1
-  longsword.dmg = 3
-chainmail = item.Armor:new()
-  chainmail.name = "Chainmail Armor"
-  chainmail.defense = 3
-bastard_sword = item.Weapon:new()
-  bastard_sword.name = "Bastard Sword"
-  bastard_sword.atk = 2
-  bastard_sword.dmg = 4
-
-player = entity.Player:new()
-  player.inventory[1] = longsword
-  player.inventory[2] = chainmail
-  player.equipped.weapon = player.inventory[1]
-  player.equipped.armor = player.inventory[2]
+function set_lvl (player, level)
+  level_add = level - player.level
+  for i=1,level_add do
+    player.xp = player.next_level
+    player:level_up()
+  end
+end
+--
+player = entity.Warrior:new()
   player:equip_update()
 --
 gerblin = entity.Monster:new()
@@ -36,6 +30,7 @@ gerblin = entity.Monster:new()
   gerblin.dmg = 2
   gerblin.defense = 11
   gerblin.loot = {bastard_sword, coins = 5}
+  gerblin.xp_value = 50
   gerblin:monster_update()
 
 test_room = tile.CombatTile:new()
