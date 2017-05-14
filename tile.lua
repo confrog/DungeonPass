@@ -1,5 +1,3 @@
-require "combat"
-
 tile = {}
 --
 tile.CombatTile = {}
