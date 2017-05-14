@@ -41,9 +41,65 @@ function combat.attack(attacker, target, circ)
   end
 end
 --
-function post_fight (player, monster, fight_res)
+function combat.player_turn (player,monster)
+  print ("Hit Points: "..player.hp.."/"..player.max_hp)
+  choices.choose(
+    'Your Turn',
+    choices.options(
+      'Fight',
+      function()
+          choices.choose(
+            "Fight",
+            choices.options(
+              'Attack',
+              function()
+              combat.attack(player, monster)
+              end,
+              "Abilities",
+              function()
+                choices.choose(
+                  "Abilities",
+                  choices.options(
+                    "Power Attack",
+                    function()
+                      player.abilities.lvl1:ability(player, monster)
+                    end,
+                    "Second Wind",
+                    function()
+                      player.abilities.lvl3:ability(player,monster)
+                    end))
+              end))
+      end,
+
+      'Flee',
+      function()
+         print("You flee from combat") -- implement fleeing code
+      end))
+end
+--
+function combat.end_turn (target)
+  target.atk_circ.duration = target.atk_circ.duration - 1
+    if target.atk_circ.duration <= 0 then
+      target.atk_circ.circ = nil
+    end
+  if target.name == "Player" then
+    for k,v in pairs(target.abilities) do
+      if v.cd_count > 0 then
+        v.cd_count = v.cd_count - 1
+      end
+    end
+  end
+end
+--
+function combat.post_fight (player, monster, fight_res)
   if fight_res == "monster dead" then
     print("The "..monster.name.." died!")
+    player.xp = player.xp + monster.xp_value
+    print("You gained "..monster.xp_value.." experience!")
+    lvl_up = player:level_up()
+    if lvl_up == true then
+      print ("You levelled up! You are now level "..player.level..".")
+    end
     if monster.loot == nil then
         print("The "..monster.name.." dropped no loot.")
     else
@@ -58,9 +114,23 @@ function post_fight (player, monster, fight_res)
         end
       end
     end
-  else
+  elseif fight_res == "player dead" then
     -- insert resolve lost combat code later
     print("You have died in glorious combat.")
+  else
+    print("ERROR")
+  end
+end
+--
+function combat.target_dead (target)
+  if target.hp <= 0 then
+    if target.name == "Player" then
+      fight_res = "player dead"
+      return true, fight_res
+    else
+      fight_res = "monster dead"
+      return true, fight_res
+    end
   end
 end
 --
@@ -75,34 +145,35 @@ function combat.fight(player, monster)
   end
   while true do
     print(init_order[1].name.."'s turn")
-    combat.attack(init_order[1], init_order[2])
-    if init_order[2].hp <= 0 then
-      if init_order[2] == monster then
-        fight_res = "monster dead"
-      else
-        fight_res = "player dead"
-      end
+    if init_order[1] == player then
+      combat.player_turn(player,monster, player.atk_circ.circ)
+    else
+    combat.attack(init_order[1], init_order[2], init_order[1].atk_circ.circ)
+    end
+    dead, fight_res = combat.target_dead(init_order[2])
+    if dead == true then
       break
     end
-    io.write("-------------------")
+    combat.end_turn (init_order[1])
+    print("-------------------")
     io.read()
     combat.sleep(.25)
     print(init_order[2].name.."'s turn")
-    combat.attack(init_order[2],init_order[1])
-    if init_order[1].hp <= 0 then
-      if init_order[1] == monster then
-        fight_res = "monster dead"
-      else
-        fight_res = "player dead"
-      end
+    if init_order[2] == player then
+      combat.player_turn(player,monster, player.atk_circ.circ)
+    else
+    combat.attack(init_order[2], init_order[1], init_order[2].atk_circ.circ)
+    end
+    dead,fight_res = combat.target_dead(init_order[1])
+    if dead == true then
       break
     end
-  
-    io.write("-------------------")
+    combat.end_turn(init_order[2])
+    print("-------------------")
     io.read()
     combat.sleep(.25)
   end
-  post_fight(player,monster,fight_res)
+  combat.post_fight(player,monster,fight_res)
 end
 --
 return combat
