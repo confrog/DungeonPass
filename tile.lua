@@ -1,3 +1,5 @@
+require('ui')
+
 tile = {}
 --
 tile.CombatTile = {}
@@ -13,8 +15,8 @@ function tile.CombatTile:new(o)
   return o
 end
 function tile.CombatTile:enter_tile(player)
-  print(self.name)
-  print(self.room_desc)
+  ui:message(self.name)
+  ui:message(self.room_desc)
   if self.is_complete == false then
     combat.fight(player, self.monster)
   else
@@ -22,7 +24,7 @@ function tile.CombatTile:enter_tile(player)
     if math.random(100) <= self.rspwn_chance then
       combat.fight(player, self.monster)
     else
-      print("The room is empty")
+      ui:message("The room is empty")
     end
   end
 end

@@ -1,17 +1,12 @@
-function p_input()
-  io.write(">>> ")
-  input_value = tostring(io.read())
-  return input_value
-end
---
+require 'ui'
 require "choices"
 require "abilities"
 require "entity"
 require "item"
 require "combat"
 require "tile"
---
---
+
+
 function set_lvl (player, level)
   level_add = level - player.level
   for i=1,level_add do
@@ -41,11 +36,11 @@ test_room = tile.CombatTile:new()
   test_room.rspwn_chance = 50
 
 test_room:enter_tile(player)
-print ("Inventory:")
+ui:message ("Inventory:")
 for k,v in pairs(player.inventory) do
   if k == "coins" then
-    print (v.." coins")
+    ui:message (v.." coins")
   else
-    print(v.name)
+    ui:message(v.name)
   end
 end

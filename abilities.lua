@@ -1,3 +1,5 @@
+require('ui')
+
 abilities = {}
 --
 -- Ability Object --
@@ -20,19 +22,19 @@ function power_atk:ability (player,target)
   atk_roll = base_roll + player.atk
   abil_dmg = player.equipped.weapon.dmg + player.level
   if self.cd_count > 0 then
-    print("This ability is on cooldown. It can be used in "..self.cd_count.." turns")
+    ui:message("This ability is on cooldown. It can be used in "..self.cd_count.." turns")
     combat.player_turn (player, target)
   else
     if base_roll == 20 then
       target.hp = target.hp - 2*abil_dmg
-      print("Critical hit! You deal "..(2*abil_dmg).." damage.")
+      ui:message("Critical hit! You deal "..(2*abil_dmg).." damage.")
     elseif atk_roll >= target.defense then
       target.hp = target.hp - abil_dmg
-      print("Roll: "..atk_roll.."\nHit! You deal "..abil_dmg.." damage.")
+      ui:message("Roll: "..atk_roll.."\nHit! You deal "..abil_dmg.." damage.")
     else
-      print("Roll: "..atk_roll.."\nMiss...")
+      ui:message("Roll: "..atk_roll.."\nMiss...")
     end
-    print("The power behind your swing throws you off balance as you follow through.")
+    ui:message("The power behind your swing throws you off balance as you follow through.")
     target.atk_circ.circ = "+"
     target.atk_circ.duration = 1
     self.cd_count = self.cd
@@ -44,7 +46,7 @@ second_wind = abilities.Ability:new()
   second_wind.cd = math.huge
 function second_wind:ability (player, target)
   if self.cd_count > 0 then
-    print("This ability is on cooldown. It cannot be used again in this combat.")
+    ui:message("This ability is on cooldown. It cannot be used again in this combat.")
     combat.player_turn (player, target)
   else
     math.randomseed(os.time())
@@ -53,7 +55,7 @@ function second_wind:ability (player, target)
     if player.hp > player.max_hp then
       player.hp = player.max_hp
     end
-    print("You take a moment to breath and regain your focus, watching your opponent's every move. You regain "..heal_amt.." hit points.")
+    ui:message("You take a moment to breath and regain your focus, watching your opponent's every move. You regain "..heal_amt.." hit points.")
     self.cd_count = self.cd
   end
 end
