@@ -1,19 +1,12 @@
-require('ui')
-
-function p_input()
-  io.write(">>> ")
-  input_value = tostring(io.read())
-  return input_value
-end
---
+require 'ui'
 require "choices"
 require "abilities"
 require "entity"
 require "item"
 require "combat"
 require "tile"
---
---
+
+
 function set_lvl (player, level)
   level_add = level - player.level
   for i=1,level_add do

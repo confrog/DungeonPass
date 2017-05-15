@@ -158,7 +158,6 @@ function combat.fight(player, monster)
     end
     combat.end_turn (init_order[1])
     ui:message("-------------------")
-    io.read()
     combat.sleep(.25)
     ui:message(init_order[2].name.."'s turn")
     if init_order[2] == player then
@@ -172,7 +171,6 @@ function combat.fight(player, monster)
     end
     combat.end_turn(init_order[2])
     ui:message("-------------------")
-    io.read()
     combat.sleep(.25)
   end
   combat.post_fight(player,monster,fight_res)

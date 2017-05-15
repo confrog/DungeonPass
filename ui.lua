@@ -1,61 +1,42 @@
 -- User interface for the game
 -- ---------------------------
---
--- Eventually, I imagine the user interface looking
--- something like this:
---
---     █████████████████████
---     █        █          █
---     █        █          █
---     █        █          █
---     █   INV  █   game   █
---     █        █          █
---     ██████████          █
---     █        █          █
---     █   HUD  █▄▄▄▄▄▄▄▄▄▄█
---     █        █   input  █
---     █████████████████████
 
-ui = {}
+require 'vscreen'
+
+ui = {
+   gameScreen = vscreen:new({
+         height = 20;
+         width = 70;
+   });
+   input = vscreen:new({
+         height = 2;
+         width = 70;
+         y = 22;
+   });
+}
 
 function ui:message(text)
-   self:formatMessage('%s\n', text)
+   self.gameScreen:write(text .. '\n')
 end
 
 function ui:formatMessage(text, ...)
-   -- TODO leave a static message window on the screen
-   io.write(string.format(text, ...))
+   self.gameScreen:write(
+      string.format(text, ...))
 end
 
 function ui:prompt(fmt, text)
-   self:formatPrompt(fmt, '%s\n', text)
+   if text == nil then
+      text = fmt
+      fmt = '*l'
+   end
+
+   self:message(text)
+   return self.input:read(fmt)
 end
 
 function ui:formatPrompt(fmt, text, ...)
-   -- TODO may need to reposition the cursor
    self:formatMessage(text, ...)
-   return io.read(fmt)
+   return self.input:read(fmt)
 end
 
 return ui
-
--- Usage Example
--- -------------
-
--- ui:message('Ay, traveler!')
--- local name = ui:prompt('And what might ye name be?')
--- ui:message(name .. '..? Well okay then')
-
--- local typedUi = {}
--- setmetatable(typedUi, ui)
--- function typedUi:message(text)
---   require('socket')
---   for i = 1,#text do
---      self:formatMessage(text[i])
---      socket.sleep(0.2)
---   end
---
---   self:formatMessage('\n')
---end
-
---typedUi:message('This is typed slowly')
