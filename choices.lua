@@ -13,7 +13,7 @@ function choices.choose(prompt, choices)
 
    for i = 1, numChoices do
       local choice = choices[i]
-      ui:formatMessage('%i) %s\n',
+      ui:formatMessage(' %i) %s\n',
                        i, choice.label)
    end
 

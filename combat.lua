@@ -46,21 +46,21 @@ end
 function combat.player_turn (player,monster)
   ui:message ("Hit Points: "..player.hp.."/"..player.max_hp)
   choices.choose(
-    'Your Turn',
+    "It's your turn! What do you do?",
     choices.options(
       'Fight',
       function()
           choices.choose(
-            "Fight",
+            "How do you want to fight?",
             choices.options(
-              'Attack',
+              'Use a basic attack',
               function()
               combat.attack(player, monster)
               end,
-              "Abilities",
+              "Use an ability",
               function()
                 choices.choose(
-                  "Abilities",
+                  "Which ability do you want to use?",
                   choices.options(
                     "Power Attack",
                     function()
