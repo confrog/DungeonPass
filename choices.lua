@@ -2,22 +2,24 @@
 -- running a particular function for each option.
 -- (This could be implemented differently depending
 --  on whether we're on the Pico8 or not)
+
+require('ui')
+
 choices = {}
 function choices.choose(prompt, choices)
    local numChoices = #choices
 
-   print(prompt)
+   ui:message(prompt)
 
    for i = 1, numChoices do
       local choice = choices[i]
-      print(
-         string.format('%i) %s\n',
-                       i, choice.label))
+      ui:formatMessage('%i) %s\n',
+                       i, choice.label)
    end
 
-   io.write(string.format('Enter a number between 1 and %i:\n >>> ',
-                          numChoices))
-   local choice = io.read('*n')
+   local choice = ui:formatPrompt('*n',
+      'Enter a number between 1 and %i:\n >>> ',
+      numChoices)
    if choice < 1 or choice > numChoices then
       error('Invalid selection!')
    end
@@ -28,7 +30,7 @@ end
 function choices.options(...)
    local opts = {}
    local input = {...}
-   print(input)
+
    for i = 1, #input, 2 do
       local option = {
          label = input[i];

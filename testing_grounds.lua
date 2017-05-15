@@ -1,3 +1,5 @@
+require('ui')
+
 function p_input()
   io.write(">>> ")
   input_value = tostring(io.read())
@@ -41,11 +43,11 @@ test_room = tile.CombatTile:new()
   test_room.rspwn_chance = 50
 
 test_room:enter_tile(player)
-print ("Inventory:")
+ui:message ("Inventory:")
 for k,v in pairs(player.inventory) do
   if k == "coins" then
-    print (v.." coins")
+    ui:message (v.." coins")
   else
-    print(v.name)
+    ui:message(v.name)
   end
 end

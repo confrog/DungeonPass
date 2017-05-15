@@ -1,3 +1,5 @@
+require('ui')
+
 combat = {}
 --
 function combat.sleep(s)
@@ -32,17 +34,17 @@ function combat.attack(attacker, target, circ)
   atk_roll = roll_base + attacker.atk
   if roll_base == 20 then
     target:lose_hp(attacker.dmg*2)
-    print("critical hit: "..(attacker.dmg*2).." damage")
+    ui:message("critical hit: "..(attacker.dmg*2).." damage")
   elseif atk_roll >= target.defense then
     target:lose_hp(attacker.dmg)
-    print("roll: "..atk_roll.."\nhit: "..attacker.dmg.." damage")
+    ui:message("roll: "..atk_roll.."\nhit: "..attacker.dmg.." damage")
   else
-    print("miss: "..atk_roll)
+    ui:message("miss: "..atk_roll)
   end
 end
 --
 function combat.player_turn (player,monster)
-  print ("Hit Points: "..player.hp.."/"..player.max_hp)
+  ui:message ("Hit Points: "..player.hp.."/"..player.max_hp)
   choices.choose(
     'Your Turn',
     choices.options(
@@ -73,7 +75,7 @@ function combat.player_turn (player,monster)
 
       'Flee',
       function()
-         print("You flee from combat") -- implement fleeing code
+         ui:message("You flee from combat") -- implement fleeing code
       end))
 end
 --
@@ -93,32 +95,32 @@ end
 --
 function combat.post_fight (player, monster, fight_res)
   if fight_res == "monster dead" then
-    print("The "..monster.name.." died!")
+    ui:message("The "..monster.name.." died!")
     player.xp = player.xp + monster.xp_value
-    print("You gained "..monster.xp_value.." experience!")
+    ui:message("You gained "..monster.xp_value.." experience!")
     lvl_up = player:level_up()
     if lvl_up == true then
-      print ("You levelled up! You are now level "..player.level..".")
+      ui:message ("You levelled up! You are now level "..player.level..".")
     end
     if monster.loot == nil then
-        print("The "..monster.name.." dropped no loot.")
+        ui:message("The "..monster.name.." dropped no loot.")
     else
-      print("The "..monster.name.." dropped:")
+      ui:message("The "..monster.name.." dropped:")
       for k,v in pairs(monster.loot) do
         if k == "coins" then
-          print (" > "..v.." coins")
+          ui:message (" > "..v.." coins")
           player.inventory.coins = player.inventory.coins + v
         else
-          print(" > "..v.name)
+          ui:message(" > "..v.name)
           table.insert(player.inventory, v)
         end
       end
     end
   elseif fight_res == "player dead" then
     -- insert resolve lost combat code later
-    print("You have died in glorious combat.")
+    ui:message("You have died in glorious combat.")
   else
-    print("ERROR")
+    ui:message("ERROR")
   end
 end
 --
@@ -144,7 +146,7 @@ function combat.fight(player, monster)
     init_order = {monster, player}
   end
   while true do
-    print(init_order[1].name.."'s turn")
+    ui:message(init_order[1].name.."'s turn")
     if init_order[1] == player then
       combat.player_turn(player,monster, player.atk_circ.circ)
     else
@@ -155,10 +157,10 @@ function combat.fight(player, monster)
       break
     end
     combat.end_turn (init_order[1])
-    print("-------------------")
+    ui:message("-------------------")
     io.read()
     combat.sleep(.25)
-    print(init_order[2].name.."'s turn")
+    ui:message(init_order[2].name.."'s turn")
     if init_order[2] == player then
       combat.player_turn(player,monster, player.atk_circ.circ)
     else
@@ -169,7 +171,7 @@ function combat.fight(player, monster)
       break
     end
     combat.end_turn(init_order[2])
-    print("-------------------")
+    ui:message("-------------------")
     io.read()
     combat.sleep(.25)
   end
