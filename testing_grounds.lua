@@ -1,10 +1,12 @@
-require 'ui'
+require "ui"
 require "choices"
 require "abilities"
 require "entity"
 require "item"
 require "combat"
 require "tile"
+require "camp"
+require "game_engine"
 
 
 function set_lvl (player, level)
@@ -24,23 +26,17 @@ gerblin = entity.Monster:new()
   gerblin.atk = 1
   gerblin.dmg = 2
   gerblin.defense = 11
-  gerblin.loot = {bastard_sword, coins = 5}
-  gerblin.xp_value = 50
+  gerblin.loot = {coins = 5}
+  gerblin.xp_value = 5
   gerblin:monster_update()
 
 test_room = tile.CombatTile:new()
   test_room.monster = gerblin
   test_room.name = "Test Chamber"
-  test_room.room_desc = "\tA blank room"
+  test_room.tile_desc = "A blank room"
   test_room.is_complete = false
   test_room.rspwn_chance = 50
+  test_room.tile_id = "101"
 
-test_room:enter_tile(player)
-ui:message ("Inventory:")
-for k,v in pairs(player.inventory) do
-  if k == "coins" then
-    ui:message (v.." coins")
-  else
-    ui:message(v.name)
-  end
-end
+tile_table = {camp.Camp,test_room}
+game_loop(tile_table)

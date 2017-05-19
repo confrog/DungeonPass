@@ -1,4 +1,5 @@
-require('ui')
+require "ui"
+require "roll"
 
 combat = {}
 --
@@ -7,30 +8,8 @@ function combat.sleep(s)
   repeat until os.clock() > ntime
 end
 --
-function combat.d20_roll(circ)
-  if circ == "+" then
-    math.randomseed(os.time())
-    roll1 = math.random(20)
-    math.randomseed(os.time()^2)
-    roll2 = math.random(20)
-    roll_f = math.max(roll1,roll2)
-    return roll_f
-  elseif circ == "-" then
-    math.randomseed(os.time()^3)
-    roll1 = math.random(20)
-    math.randomseed(os.time()^4)
-    roll2 = math.random(20)
-    roll_f = math.min(roll1,roll2)
-    return roll_f
-  else
-    math.randomseed(os.time()^5)
-    roll_f = math.random(20)
-    return roll_f
-  end
-end
---
 function combat.attack(attacker, target, circ)
-  roll_base = combat.d20_roll(circ)
+  roll_base = roll.d20_roll(circ)
   atk_roll = roll_base + attacker.atk
   if roll_base == 20 then
     target:lose_hp(attacker.dmg*2)
@@ -115,6 +94,7 @@ function combat.post_fight (player, monster, fight_res)
           table.insert(player.inventory, v)
         end
       end
+      return true
     end
   elseif fight_res == "player dead" then
     -- insert resolve lost combat code later
@@ -137,8 +117,8 @@ function combat.target_dead (target)
 end
 --
 function combat.fight(player, monster)
-  player_init = combat.d20_roll()
-  monster_init = combat.d20_roll()
+  player_init = roll.d20_roll()
+  monster_init = roll.d20_roll()
   fight_res = nil
   if math.max(player_init, monster_init) == player_init then
     init_order = {player, monster}
@@ -158,7 +138,7 @@ function combat.fight(player, monster)
     end
     combat.end_turn (init_order[1])
     ui:message("-------------------")
-    combat.sleep(.25)
+    combat.sleep(1)
     ui:message(init_order[2].name.."'s turn")
     if init_order[2] == player then
       combat.player_turn(player,monster, player.atk_circ.circ)
@@ -171,9 +151,9 @@ function combat.fight(player, monster)
     end
     combat.end_turn(init_order[2])
     ui:message("-------------------")
-    combat.sleep(.25)
+    combat.sleep(1)
   end
-  combat.post_fight(player,monster,fight_res)
+  return combat.post_fight(player,monster,fight_res)
 end
 --
 return combat

@@ -17,6 +17,7 @@ entity.Player = {}
   entity.Player.dmg = entity.Player.equipped.weapon.dmg
   entity.Player.defense = 10 + entity.Player.equipped.armor.defense
   entity.Player.atk_circ = {circ = nil, duration = 0}
+  entity.Player.status = "alive"
 function entity.Player:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -51,7 +52,7 @@ entity.Warrior = entity.Player:new()
   entity.Warrior.max_hp = 12
   entity.Warrior.hp = entity.Warrior.max_hp
   entity.Warrior.hp_bonus = 2
-  entity.Warrior.inventory = {longsword,merc_armor, coins = 0}
+  entity.Warrior.inventory = {longsword, merc_armor, coins = 0}
   entity.Warrior.equipped = {weapon = longsword, armor = merc_armor}
   entity.Warrior.abilities = {lvl1 = power_atk, lvl3 = second_wind}
 function entity.Warrior:new(o)
@@ -65,7 +66,7 @@ entity.Thief = entity.Player:new()
   entity.Thief.max_hp = 10
   entity.Thief.hp_bonus = 1
   entity.Thief.hp = entity.Thief.max_hp
-  entity.Thief.inventory = {dirk,thief_armor, coins = 0}
+  entity.Thief.inventory = {dirk, thief_armor, coins = 0}
   entity.Thief.equipped = {weapon = dirk, armor = thief_armor}
   entity.Thief.abilities = {}
 function entity.Thief:new(o)
@@ -78,7 +79,7 @@ end
 entity.Mage = entity.Player:new()
   entity.Mage.max_hp = 8
   entity.Mage.hp = entity.Mage.max_hp
-  entity.Mage.inventory = {staff,robes, coins = 0}
+  entity.Mage.inventory = {staff, robes, coins = 0}
   entity.Mage.equipped = {weapon = staff, armor = robes}
   entity.Mage.abilities = {}
 function entity.Mage:new(o)

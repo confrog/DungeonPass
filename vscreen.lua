@@ -3,7 +3,7 @@
 -- These virtual screens take up a section of the real
 -- screen, and allow text to be written within them.
 
-require 'terminal'
+require "terminal"
 
 vscreen = {
    terminal = terminal;

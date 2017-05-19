@@ -1,4 +1,4 @@
-require('ui')
+require "ui"
 
 abilities = {}
 --
@@ -18,7 +18,7 @@ power_atk = abilities.Ability:new()
   power_atk.name = "Power Attack"
   power_atk.cd = 3
 function power_atk:ability (player,target)
-  base_roll = combat.d20_roll()
+  base_roll = roll.d20_roll()
   atk_roll = base_roll + player.atk
   abil_dmg = player.equipped.weapon.dmg + player.level
   if self.cd_count > 0 then
@@ -45,12 +45,13 @@ second_wind = abilities.Ability:new()
   second_wind.name = "Second Wind"
   second_wind.cd = math.huge
 function second_wind:ability (player, target)
+  r = random.new(12345)
+  r:seed(os.time())
   if self.cd_count > 0 then
     ui:message("This ability is on cooldown. It cannot be used again in this combat.")
     combat.player_turn (player, target)
   else
-    math.randomseed(os.time())
-    heal_amt = math.random(10) + player.level
+    heal_amt = r:value(1,10) + player.level
     player.hp = player.hp + heal_amt
     if player.hp > player.max_hp then
       player.hp = player.max_hp

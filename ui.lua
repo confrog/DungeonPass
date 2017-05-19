@@ -1,7 +1,7 @@
 -- User interface for the game
 -- ---------------------------
 
-require 'vscreen'
+require "vscreen"
 
 ui = {
    gameScreen = vscreen:new({
