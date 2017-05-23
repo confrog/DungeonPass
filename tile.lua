@@ -1,6 +1,7 @@
 require "ui"
 
 tile = {}
+-- Utility Functions --
 -- Combat Tile --
 tile.CombatTile = {}
   tile.CombatTile.monster = nil;
@@ -50,9 +51,37 @@ tile.ExploreTile = {}
   tile.ExploreTile.tile_desc = "None"
   tile.ExploreTile.option_text = {}
   tile.ExploreTile.option_action = {}
-  tile.ExploreTile.key = nil
+  tile.ExploreTile.key_item = nil
   tile.ExploreTile.is_complete = false
   tile.ExploreTile.tile_id = "000"
   tile.ExploreTile.next_id = "000"
+function tile.ExploreTile:new(o)
+  o = o or {}
+  setmetatable(o,self)
+  self.__index = self
+  return o
+end
+function tile.ExploreTile:load_tile(player)
+  ui:message(self.name)
+  ui:message(self.tile_desc)
+  if self.is_complete == false then
+    self.is_complete = choices.choose(
+      "What do you do?",
+      choices.iter_options(self.option_text,self.option_action))
+  else
+     next_tile = choices.choose(
+    "What do you want to do?",
+    choices.options(
+      "Continue forward",
+      function()
+        return tile.ExploreTile.next_id
+      end,
+      "Return to camp",
+      function()
+        return "001"
+      end))
+    return next_tile
+  end
+end
 --
 return tile

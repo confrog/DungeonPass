@@ -1,14 +1,161 @@
-
+require "item"
 camp = {}
 -- Merchant --
 camp.Merchant = {}
-  camp.Merchant.inventory = {} -- fill in item inventory
-function camp.Merchant:dialogue()
-  -- write merchant dialogue code
-end
+  camp.Merchant.inventory = {bastard_sword, chainmail, s_rock} -- fill in item inventory
 function camp.Merchant:visit_merchant(player)
-  -- write visit merchant code
+  ui:message("As you approach the merchant's wagon, he greets you:\"Well met, Adventurer. What can I help you with today?\"")
+  camp.Merchant:at_merchant(player)
 end
+function camp.Merchant:at_merchant(player)
+  choices.choose(
+    "What would you like to do?",
+    choices.options(
+      "Buy",
+      function()
+        camp.Merchant:buy(player)
+      end,
+      "Sell",
+      function()
+        camp.Merchant:sell(player)
+      end,
+      "Talk to the merchant",
+      function()
+        camp.Merchant:dialogue(player)
+      end,
+      "Return to the center of camp",
+      function()
+        camp.Camp:in_camp(player)
+      end))
+end
+function camp.Merchant:buy(player)
+  n = 0
+  ui:message(" > Merchant's Inventory <")
+  for k,v in ipairs(self.inventory) do
+    n = n + 1
+    if v.item_type == "weapon" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+    elseif v.item_type == "armor" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+    elseif v.item_type == "generic item" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold")
+    end
+  end
+  ui:message((n+1).." > Back")
+  ui:message("What would you like to buy?")
+  input = tonumber(ui:formatPrompt('*n', "Enter a number (1-"..(n+1).."):\n\n"))
+  if input == n+1 then
+    camp.Merchant:at_merchant(player)
+  elseif input <= n then
+    choices.choose(
+      "Are you sure you want to buy the "..self.inventory[input].name.."?",
+      choices.options(
+        "Yes",
+        function ()
+          if player.inventory.coins < self.inventory[input].value then
+            ui:message("You cannot afford this item\n")
+            utility.sleep(2)
+            camp.Merchant:buy(player)
+          else
+            player.inventory.coins = player.inventory.coins - self.inventory[input].value
+            table.insert(player.inventory,self.inventory[input])
+            table.remove(self.inventory,input)
+            ui:message("\"A fine purchase,\" says the merchant. \"Many thanks.\"")
+            utility.sleep(2)
+            camp.Merchant:buy(player)
+          end
+        end,
+        "No",
+        function()
+          camp.Merchant:buy(player)
+        end))
+    
+  else
+    ui:message("Invalid Input\n")
+    utility.sleep(2)
+    camp.Merchant:buy(player)
+  end
+end
+function camp.Merchant:sell(player)
+  n = 0
+  ui:message(" > Inventory <")
+  for k,v in ipairs(player.inventory) do
+    n = n + 1
+    if v.equipped == true then
+      if v.item_type == "weapon" then
+        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+      elseif v.item_type == "armor" then
+        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+      end
+    elseif v.item_type == "weapon" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+    elseif v.item_type == "armor" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+    elseif v.item_type == "generic item" then
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold")
+    end
+  end
+  ui:message((n+1).." > Back")
+  ui:message("What would you like to sell?")
+  input = tonumber(ui:formatPrompt('*n', "Enter a number (1-"..(n+1).."):\n\n"))
+  if input == n+1 then
+    camp.Merchant:at_merchant(player)
+  elseif input <= n then
+    choices.choose(
+      "Are you sure you want to sell the "..player.inventory[input].name.."?",
+      choices.options(
+        "Yes",
+        function ()
+          player.inventory.coins = player.inventory.coins + player.inventory[input].value
+          table.insert(self.inventory,player.inventory[input])
+          table.remove(player.inventory,input)
+          ui:message("\"A fine sale,\" says the merchant. \"Many thanks.\"")
+          utility.sleep(2)
+          camp.Merchant:sell(player)
+        end,
+        "No",
+        function()
+          camp.Merchant:sell(player)
+        end))
+  else
+    ui:message("Invalid Input\n")
+    utility.sleep(2)
+    camp.Merchant:sell(player)
+  end
+end
+function camp.Merchant:dialogue(player)
+  choices.choose(
+    "What do you want to say?",
+    choices.options(
+      '"What sort of things do you sell?"',
+      function()
+        ui:message('"All sorts of things! I\'ve got weapons, armor, and just about anything else an adventurer like yourself might need in their travels."')
+        prompt = ui:formatPrompt('*n', "(Enter 1 to continue)")
+        if prompt == 1 then
+          self:dialogue(player)
+        end
+      end,
+      '"What can you tell me about the caves?"',
+      function()
+        ui:message('"I\'ve heard from other adventurers like yourself that those caves have an opening into the dungeons of that castle up on the mountain, but that there are strange stone soldiers that patrol the dungeon\'s halls."')
+        prompt = ui:formatPrompt('*n', "(Enter 1 to continue)\n\n")
+        if prompt == 1 then
+          self:dialogue(player)
+        end
+      end,
+      '"Why are you here?"',
+      function()
+        ui:message('"Business, my friend, business! While it\'s fairly quiet right now, there are always more adventurers like yourself passing through who are willing to spend good coin on my wares. The fountain here in the camp is also considered somewhat of a holy site, so I get the occasional pilgrim as well."')
+        prompt = ui:formatPrompt('*n', "(Enter 1 to continue)")
+        if prompt == 1 then
+          self:dialogue(player)
+        end
+      end,
+      'Back',
+      function()
+        self:at_merchant(player)
+      end))
+end       
 -- Fountain --
 camp.Fountain = {}
 function camp.Fountain:visit_fountain(player)
@@ -60,35 +207,91 @@ function camp.Camp:enter_camp(player)
 end
 function camp.Camp:in_camp (player)
   choices.choose(
-    "You stand in the center of camp, next to your bedroll. Where do you go?",
+    "You stand in the center of camp. What do you want to do?",
     choices.options(
-      "North - To the caves",
+      "Go North - To the caves",
       function()
         return "101"
       end,
-      "East - Visit the merchant",
+      "Go East - Visit the merchant",
       function()
         camp.Merchant:visit_merchant(player)
       end,
-      "West - Visit the fountain",
+      "Go West - Visit the fountain",
       function()
         camp.Fountain:visit_fountain(player)
       end,
-      "West - Climb the crag",
+      "Go West - Climb the crag",
       function()
         ui:message("You make your way up the rocky path to the top of the western crag, and you are met with a spectacular view: \n\tTo the north, you see through a gap in the mountains a large castle with a tall tower at its center.\n\tTo the west you see set of switchbacks leading down the face of the crag into a sprawling graveyard to spreads as far as you can see. Near the end of the switchbacks is a hut with a trickle of smoke coming from the chimney. Way out in the center of the graveyard at the end of the path is a low stone building that seems to sunken partially into the ground.")
         choices.choose(
-          "Where do you go?",
+          "What do you want to do?",
           choices.options(
-            "East - Back down to camp",
+            "Go East - Back down to camp",
             function()
               return "001"
             end,
-            "West - Down the switchbacks to the graveyard",
+            "Go West - Down the switchbacks to the graveyard",
             function()
               return "002"
             end))
+      end,
+      "View Character",
+      function()
+        ui:message("Class: "..player.class)
+        ui:message("Hit Points: "..player.hp.."/"..player.max_hp)
+        ui:message("Attack: "..player.atk)
+        ui:message("Damage: "..player.dmg)
+        ui:message("Defense: "..player.defense)
+        ui:message("Weapon: "..player.equipped.weapon.name)
+        ui:message("Armor: "..player.equipped.armor.name)
+        if player.equipped.trinket ~= nil then
+          ui:message("Trinket: "..player.equipped.trinket.name)
+        end
+        choices.choose(
+          "What do you want to do?",
+          choices.options(
+            "Equip item",
+            function()
+              
+            end,
+            "View abilities",
+            function()
+              
+            end))
       end))
+  end
+  function camp.Camp:equipping_item(player)
+    n = 0
+    ui:message(" > Inventory <")
+    for k,v in ipairs(player.inventory) do
+      n = n + 1
+      if v.equipped == true then
+        if v.item_type == "weapon" then
+          ui:message("(E) "..k.." > "..v.name, "value: "..v.value.." gold", "attack: "..v.atk, "damage: "..v.dmg)
+        elseif v.item_type == "armor" then
+          ui:message("(E) "..k.." > "..v.name, "value: "..v.value.." gold", "defense: "..v.defense)
+        end
+      elseif v.item_type == "weapon" then
+        ui:message(k.." > "..v.name, "value: "..v.value.." gold", "attack: "..v.atk, "damage: "..v.dmg)
+      elseif v.item_type == "armor" then
+        ui:message(k.." > "..v.name, "value: "..v.value.." gold", "defense: "..v.defense)
+      elseif v.item_type == "generic item" then
+        ui:message(k.." > "..v.name, "value: "..v.value.." gold")
+      end
+    end
+    ui:message((n+1).." > Back")
+    ui:message("What would you like to equip?")
+    input = tonumber(ui:formatPrompt('*n', "Enter a number (1-"..(n+1).."):\n\n"))
+    if input == n+1 then
+      camp.Camp:in_camp(player)
+    elseif input <= n then
+      player.equip_item(player.inventory[input])
+    else
+      ui:message("Invalid Input")
+      utility.sleep(2)
+      camp.Camp:in_camp(player)
+    end
   end
 function camp.Camp:load_tile(player)
   camp.Camp:enter_camp (player)

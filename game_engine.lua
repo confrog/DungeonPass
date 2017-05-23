@@ -36,7 +36,7 @@ function game_start()
 end
 --
 function tile_loader (tile_id,tile_table, player)
-  for k,v in pairs(tile_table) do
+  for k,v in ipairs(tile_table) do
     if v.tile_code == tile_id then
       next_id = v:load_tile(player)
       return next_id

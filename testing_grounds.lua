@@ -1,4 +1,5 @@
 require "ui"
+require "utility"
 require "choices"
 require "abilities"
 require "entity"
@@ -7,18 +8,6 @@ require "combat"
 require "tile"
 require "camp"
 require "game_engine"
-
-
-function set_lvl (player, level)
-  level_add = level - player.level
-  for i=1,level_add do
-    player.xp = player.next_level
-    player:level_up()
-  end
-end
---
-player = entity.Warrior:new()
-  player:equip_update()
 --
 gerblin = entity.Monster:new()
   gerblin.name = "Gerblin"
@@ -37,6 +26,24 @@ test_room = tile.CombatTile:new()
   test_room.is_complete = false
   test_room.rspwn_chance = 50
   test_room.tile_id = "101"
+  test_room.next_id = "102"
 
-tile_table = {camp.Camp,test_room}
+test_room2 = tile.ExploreTile:new()
+  test_room2.name = "Exploration Test Chamber"
+  test_room2.tile_desc = "A blank room with a wooden door on the far wall."
+  test_room2.option_text = {"Cross the room and open the door","Sit in the middle of the room"}
+  test_room2.option_action = {}
+  function test_room2.option_action:option1(player)
+    ui:message("You cross the room and pull the door open: behind the door is a yawning black void.")
+    return true
+  end
+  function test_room2.option_action:option2(player)
+    ui:message("You sit in the middle of the room, waiting for something to happen. A small rock falls from the ceiling and lands on your head. Ouch! You take 1 damage.")
+    player.hp = player.hp - 1
+    return test_room2.load_tile(player)
+  end
+  test_room2.tile_id = "102"
+  
+
+tile_table = {camp.Camp,test_room,test_room2}
 game_loop(tile_table)

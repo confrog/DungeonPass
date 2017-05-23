@@ -12,7 +12,7 @@ entity.Player = {}
   entity.Player.hp_bonus = 0
   entity.Player.hp = entity.Player.max_hp
   entity.Player.inventory = {coins = 0}
-  entity.Player.equipped = {weapon = unarmed, armor = naked}
+  entity.Player.equipped = {weapon = unarmed, armor = naked, trinket = nil}
   entity.Player.atk = entity.Player.equipped.weapon.atk
   entity.Player.dmg = entity.Player.equipped.weapon.dmg
   entity.Player.defense = 10 + entity.Player.equipped.armor.defense
@@ -36,6 +36,27 @@ function entity.Player:equip_update()
   self.dmg = self.equipped.weapon.dmg
   self.defense = 10 + self.equipped.armor.defense
 end
+function entity.Player:equip_item(item)  
+  if item.type == "weapon" then
+    self.equipped.weapon.equipped = false
+    self.equipped.weapon = item
+    item.equipped = true
+    ui:message(item.name.." equipped")
+  elseif item.type == "armor" then
+    self.equipped.armor.equipped = false
+    self.equipped.armor = item
+    item.equipped = true
+    ui:message(item.name.." equipped")
+  elseif item.type == "trinket" then
+    self.equipped.trinket.equipped = false
+    self.equipped.trinket = item
+    item.equipped = true
+    ui:message(item.name.." equipped")
+  else
+    ui:mesage("This item cannot be equipped.")
+    utility.sleep(2)
+  end
+end
 function entity.Player:level_up()
   if self.xp >= self.next_lvl then
     self.xp = self.xp - self.next_lvl
@@ -53,8 +74,10 @@ entity.Warrior = entity.Player:new()
   entity.Warrior.hp = entity.Warrior.max_hp
   entity.Warrior.hp_bonus = 2
   entity.Warrior.inventory = {longsword, merc_armor, coins = 0}
-  entity.Warrior.equipped = {weapon = longsword, armor = merc_armor}
+  entity.Warrior.equipped = {weapon = longsword, armor = merc_armor, trinket = nil}
   entity.Warrior.abilities = {lvl1 = power_atk, lvl3 = second_wind}
+  entity.Warrior.equipped.weapon.equipped = true
+  entity.Warrior.equipped.armor.equipped = true
 function entity.Warrior:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -67,8 +90,10 @@ entity.Thief = entity.Player:new()
   entity.Thief.hp_bonus = 1
   entity.Thief.hp = entity.Thief.max_hp
   entity.Thief.inventory = {dirk, thief_armor, coins = 0}
-  entity.Thief.equipped = {weapon = dirk, armor = thief_armor}
+  entity.Thief.equipped = {weapon = dirk, armor = thief_armor, trinket = nil}
   entity.Thief.abilities = {}
+  entity.Thief.equipped.weapon.equipped = true
+  entity.Thief.equipped.armor.equipped = true
 function entity.Thief:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -80,8 +105,10 @@ entity.Mage = entity.Player:new()
   entity.Mage.max_hp = 8
   entity.Mage.hp = entity.Mage.max_hp
   entity.Mage.inventory = {staff, robes, coins = 0}
-  entity.Mage.equipped = {weapon = staff, armor = robes}
+  entity.Mage.equipped = {weapon = staff, armor = robes, trinket = nil}
   entity.Mage.abilities = {}
+  entity.Mage.equipped.weapon.equipped = true
+  entity.Mage.equipped.armor.equipped = true
 function entity.Mage:new(o)
   o = o or {}
   setmetatable(o,self)

@@ -3,11 +3,6 @@ require "roll"
 
 combat = {}
 --
-function combat.sleep(s)
-  local ntime = os.clock() + s
-  repeat until os.clock() > ntime
-end
---
 function combat.attack(attacker, target, circ)
   roll_base = roll.d20_roll(circ)
   atk_roll = roll_base + attacker.atk
@@ -138,7 +133,7 @@ function combat.fight(player, monster)
     end
     combat.end_turn (init_order[1])
     ui:message("-------------------")
-    combat.sleep(1)
+    utility.sleep(1)
     ui:message(init_order[2].name.."'s turn")
     if init_order[2] == player then
       combat.player_turn(player,monster, player.atk_circ.circ)
@@ -151,7 +146,7 @@ function combat.fight(player, monster)
     end
     combat.end_turn(init_order[2])
     ui:message("-------------------")
-    combat.sleep(1)
+    utility.sleep(1)
   end
   return combat.post_fight(player,monster,fight_res)
 end

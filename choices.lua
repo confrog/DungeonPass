@@ -42,6 +42,19 @@ function choices.options(...)
    return opts
 end
 --
+function choices.iter_options(...)
+  local opts = {}
+  local input = {...}
+  for i = 1, #input[1], 2 do
+    local option = {
+        label = input[1][i];
+        callback = input[2][i]
+    }
+    table.insert(opts, option)
+   end
+  return opts
+end
+--
 return choices
 -------------------
 -- USAGE EXAMPLE --
