@@ -1,10 +1,12 @@
 require "item"
+require "abilities"
 --
 entity = {}
 --
 -- Player Object --
 entity.Player = {}
   entity.Player.name = "Player"
+  entity.Player.class = "None"
   entity.Player.level = 1
   entity.Player.xp = 0
   entity.Player.next_lvl = 50 * entity.Player.level
@@ -18,6 +20,7 @@ entity.Player = {}
   entity.Player.defense = 10 + entity.Player.equipped.armor.defense
   entity.Player.atk_circ = {circ = nil, duration = 0}
   entity.Player.status = "alive"
+  entity.Player.fled = false
 function entity.Player:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -37,25 +40,25 @@ function entity.Player:equip_update()
   self.defense = 10 + self.equipped.armor.defense
 end
 function entity.Player:equip_item(item)  
-  if item.type == "weapon" then
+  if item.item_type == "weapon" then
     self.equipped.weapon.equipped = false
     self.equipped.weapon = item
     item.equipped = true
     ui:message(item.name.." equipped")
-  elseif item.type == "armor" then
+  elseif item.item_type == "armor" then
     self.equipped.armor.equipped = false
     self.equipped.armor = item
     item.equipped = true
     ui:message(item.name.." equipped")
-  elseif item.type == "trinket" then
+  elseif item.item_type == "trinket" then
     self.equipped.trinket.equipped = false
     self.equipped.trinket = item
     item.equipped = true
     ui:message(item.name.." equipped")
   else
-    ui:mesage("This item cannot be equipped.")
-    utility.sleep(2)
+    ui:message("This item cannot be equipped.")
   end
+  utility.sleep(2)
 end
 function entity.Player:level_up()
   if self.xp >= self.next_lvl then
@@ -63,6 +66,31 @@ function entity.Player:level_up()
     self.level = self.level + 1
     self.max_hp = self.max_hp + self.hp_bonus + 5
     self.hp = self.max_hp
+    if self.class == "Warrior" then
+      if self.level == 3 then
+        table.insert(self.abilities, second_wind)
+      elseif self.level == 6 then
+        --write lvl 6 ability
+      elseif self.level == 9 then
+        --write lvl 9 ability
+      end
+    elseif self.class == "Thief" then
+      if self.level == 3 then
+        -- write lvl 3 ability
+      elseif self.level == 6 then
+        --write lvl 6 ability
+      elseif self.level == 9 then
+        --write lvl 9 ability
+      end
+    elseif self.class == "Mage" then
+      if self.level == 3 then
+        -- write lvl 3 ability
+      elseif self.level == 6 then
+        --write lvl 6 ability
+      elseif self.level == 9 then
+        --write lvl 9 ability
+      end
+    end
     return true
   else
     return false
@@ -70,12 +98,13 @@ function entity.Player:level_up()
 end
 -- Warrior --
 entity.Warrior = entity.Player:new()
+  entity.Warrior.class = "Warrior"
   entity.Warrior.max_hp = 12
   entity.Warrior.hp = entity.Warrior.max_hp
   entity.Warrior.hp_bonus = 2
   entity.Warrior.inventory = {longsword, merc_armor, coins = 0}
   entity.Warrior.equipped = {weapon = longsword, armor = merc_armor, trinket = nil}
-  entity.Warrior.abilities = {lvl1 = power_atk, lvl3 = second_wind}
+  entity.Warrior.abilities = {power_atk, second_wind}
   entity.Warrior.equipped.weapon.equipped = true
   entity.Warrior.equipped.armor.equipped = true
 function entity.Warrior:new(o)
@@ -86,6 +115,7 @@ function entity.Warrior:new(o)
 end
 --
 entity.Thief = entity.Player:new()
+  entity.Thief.class = "Thief"
   entity.Thief.max_hp = 10
   entity.Thief.hp_bonus = 1
   entity.Thief.hp = entity.Thief.max_hp
@@ -102,6 +132,7 @@ function entity.Thief:new(o)
 end
 --
 entity.Mage = entity.Player:new()
+  entity.Mage.class = "Mage"
   entity.Mage.max_hp = 8
   entity.Mage.hp = entity.Mage.max_hp
   entity.Mage.inventory = {staff, robes, coins = 0}
@@ -126,6 +157,7 @@ entity.Monster = {}
   entity.Monster.defense = 10
   entity.Monster.xp_value = 0
   entity.Monster.atk_circ = {circ = nil, duration = 0}
+  entity.Monster.fled = false
 function entity.Monster:new(o)
   o = o or {}
   setmetatable(o,self)

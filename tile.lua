@@ -9,8 +9,8 @@ tile.CombatTile = {}
   tile.CombatTile.tile_desc = "None";
   tile.CombatTile.is_complete = false;
   tile.CombatTile.rspwn_chance = 0
-  tile.CombatTile.tile_id = "000"
-  tile.CombatTile.next_id = "000"
+  tile.CombatTile.tile_code = "000"
+  tile.CombatTile.next_code = "000"
 function tile.CombatTile:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -22,6 +22,10 @@ function tile.CombatTile:load_tile(player)
   ui:message(self.tile_desc)
   if self.is_complete == false then
     self.is_complete = combat.fight(player, self.monster)
+    if player.fled == true then
+      player.fled = false
+      return "001"
+    end
   else
     r = random.new(12345)
     r:seed(os.time())
@@ -37,7 +41,7 @@ function tile.CombatTile:load_tile(player)
     choices.options(
       "Continue forward",
       function()
-        return tile.CombatTile.next_id
+        return self.next_code
       end,
       "Return to camp",
       function()
@@ -53,8 +57,8 @@ tile.ExploreTile = {}
   tile.ExploreTile.option_action = {}
   tile.ExploreTile.key_item = nil
   tile.ExploreTile.is_complete = false
-  tile.ExploreTile.tile_id = "000"
-  tile.ExploreTile.next_id = "000"
+  tile.ExploreTile.tile_code = "000"
+  tile.ExploreTile.next_code = "000"
 function tile.ExploreTile:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -67,14 +71,14 @@ function tile.ExploreTile:load_tile(player)
   if self.is_complete == false then
     self.is_complete = choices.choose(
       "What do you do?",
-      choices.iter_options(self.option_text,self.option_action))
+      choices.iterFunc_opt1(self.option_text,self.option_action,player))
   else
      next_tile = choices.choose(
     "What do you want to do?",
     choices.options(
       "Continue forward",
       function()
-        return tile.ExploreTile.next_id
+        return tile.ExploreTile.next_code
       end,
       "Return to camp",
       function()

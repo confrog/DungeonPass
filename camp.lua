@@ -34,11 +34,11 @@ function camp.Merchant:buy(player)
   for k,v in ipairs(self.inventory) do
     n = n + 1
     if v.item_type == "weapon" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tattack: "..v.atk.."\tdamage: "..v.dmg)
     elseif v.item_type == "armor" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tdefense: "..v.defense)
     elseif v.item_type == "generic item" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold")
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins")
     end
   end
   ui:message((n+1).." > Back")
@@ -83,16 +83,16 @@ function camp.Merchant:sell(player)
     n = n + 1
     if v.equipped == true then
       if v.item_type == "weapon" then
-        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." coins\tattack: "..v.atk.."\tdamage: "..v.dmg)
       elseif v.item_type == "armor" then
-        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." coins\tdefense: "..v.defense)
       end
     elseif v.item_type == "weapon" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tattack: "..v.atk.."\tdamage: "..v.dmg)
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tattack: "..v.atk.."\tdamage: "..v.dmg)
     elseif v.item_type == "armor" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold\tdefense: "..v.defense)
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tdefense: "..v.defense)
     elseif v.item_type == "generic item" then
-      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." gold")
+      ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins")
     end
   end
   ui:message((n+1).." > Back")
@@ -206,7 +206,7 @@ function camp.Camp:enter_camp(player)
   end
 end
 function camp.Camp:in_camp (player)
-  choices.choose(
+  info = choices.choose(
     "You stand in the center of camp. What do you want to do?",
     choices.options(
       "Go North - To the caves",
@@ -253,13 +253,14 @@ function camp.Camp:in_camp (player)
           choices.options(
             "Equip item",
             function()
-              
+              camp.Camp:equipping_item(player)
             end,
             "View abilities",
             function()
               
             end))
       end))
+    return info
   end
   function camp.Camp:equipping_item(player)
     n = 0
@@ -268,16 +269,16 @@ function camp.Camp:in_camp (player)
       n = n + 1
       if v.equipped == true then
         if v.item_type == "weapon" then
-          ui:message("(E) "..k.." > "..v.name, "value: "..v.value.." gold", "attack: "..v.atk, "damage: "..v.dmg)
+          ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." coins\tattack: "..v.atk.."\tdamage: "..v.dmg)
         elseif v.item_type == "armor" then
-          ui:message("(E) "..k.." > "..v.name, "value: "..v.value.." gold", "defense: "..v.defense)
+        ui:message("(E) "..k.." > "..v.name.."\tvalue: "..v.value.." coins\tdefense: "..v.defense)
         end
       elseif v.item_type == "weapon" then
-        ui:message(k.." > "..v.name, "value: "..v.value.." gold", "attack: "..v.atk, "damage: "..v.dmg)
+        ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tattack: "..v.atk.."\tdamage: "..v.dmg)
       elseif v.item_type == "armor" then
-        ui:message(k.." > "..v.name, "value: "..v.value.." gold", "defense: "..v.defense)
+        ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins\tdefense: "..v.defense)
       elseif v.item_type == "generic item" then
-        ui:message(k.." > "..v.name, "value: "..v.value.." gold")
+        ui:message(k.." > "..v.name.."\tvalue: "..v.value.." coins")
       end
     end
     ui:message((n+1).." > Back")
@@ -286,7 +287,8 @@ function camp.Camp:in_camp (player)
     if input == n+1 then
       camp.Camp:in_camp(player)
     elseif input <= n then
-      player.equip_item(player.inventory[input])
+      player:equip_item(player.inventory[input])
+      camp.Camp:in_camp(player)
     else
       ui:message("Invalid Input")
       utility.sleep(2)
@@ -295,8 +297,8 @@ function camp.Camp:in_camp (player)
   end
 function camp.Camp:load_tile(player)
   camp.Camp:enter_camp (player)
-  tile_code = camp.Camp:in_camp(player)
-  return tile_code
+  next_code = camp.Camp:in_camp(player)
+  return next_code
 end
 --
 return camp

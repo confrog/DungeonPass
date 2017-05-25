@@ -24,50 +24,33 @@ function combat.player_turn (player,monster)
     choices.options(
       'Fight',
       function()
-          choices.choose(
-            "How do you want to fight?",
-            choices.options(
-              'Use a basic attack',
-              function()
+        choices.choose(
+          "How do you want to fight?",
+          choices.options(
+            'Use a basic attack',
+            function()
               combat.attack(player, monster)
-              end,
-              "Use an ability",
-              function()
-                choices.choose(
-                  "Which ability do you want to use?",
-                  choices.options(
-                    "Power Attack",
-                    function()
-                      player.abilities.lvl1:ability(player, monster)
-                    end,
-                    "Second Wind",
-                    function()
-                      player.abilities.lvl3:ability(player,monster)
-                    end))
-              end))
-      end,
-
+            end,
+            "Use an ability",
+            function()
+              choices.choose(
+                "Which ability do you want to use?",
+                choices.iterFunc_opt2(player.abilities, player, monster)) 
+            end))
+        end,
       'Flee',
       function()
-         ui:message("You flee from combat") -- implement fleeing code
+        ui:message("You flee from combat")
+        player.fled = true
       end))
 end
 --
-function combat.end_turn (target)
-  target.atk_circ.duration = target.atk_circ.duration - 1
-    if target.atk_circ.duration <= 0 then
-      target.atk_circ.circ = nil
-    end
-  if target.name == "Player" then
-    for k,v in pairs(target.abilities) do
-      if v.cd_count > 0 then
-        v.cd_count = v.cd_count - 1
-      end
-    end
-  end
-end
---
 function combat.post_fight (player, monster, fight_res)
+  player.atk_circ.circ = nil
+  player.atk_circ.duration = 0
+  for k,v in ipairs(player.abilities) do
+    v.cd_count = 0
+  end
   if fight_res == "monster dead" then
     ui:message("The "..monster.name.." died!")
     player.xp = player.xp + monster.xp_value
@@ -91,17 +74,47 @@ function combat.post_fight (player, monster, fight_res)
       end
       return true
     end
+  elseif fight_res == "monster fled" then
+    ui:message("The "..monster.name.." flees from you!")
+    player.xp = player.xp + monster.xp_value
+    ui:message("You gained "..monster.xp_value.." experience!")
+    lvl_up = player:level_up()
+    if lvl_up == true then
+      ui:message ("You levelled up! You are now level "..player.level..".")
+    end
   elseif fight_res == "player dead" then
-    -- insert resolve lost combat code later
-    ui:message("You have died in glorious combat.")
+    ui:message("The "..monster.name.." strikes you down!")
+    player.status = "unconscious"
+    return false
+  elseif fight_res == "player fled" then
+    return false
   else
     ui:message("ERROR")
   end
 end
 --
-function combat.target_dead (target)
-  if target.hp <= 0 then
-    if target.name == "Player" then
+function combat.turn_resolve(target1, target2)
+  target1.atk_circ.duration = target1.atk_circ.duration - 1
+    if target1.atk_circ.duration <= 0 then
+      target1.atk_circ.circ = nil
+    end
+  if target1.name == "Player" then
+    for k,v in pairs(target1.abilities) do
+      if v.cd_count > 0 then
+        v.cd_count = v.cd_count - 1
+      end
+    end
+  end
+  if target1.fled == true then
+    if target1.name == "Player"then
+      fight_res = "player fled"
+      return true, fight_res
+    else
+      fight_res = "monster fled"
+      return true,fight_res
+    end
+  elseif target2.hp <= 0 then
+    if target2.name == "Player" then
       fight_res = "player dead"
       return true, fight_res
     else
@@ -127,11 +140,10 @@ function combat.fight(player, monster)
     else
     combat.attack(init_order[1], init_order[2], init_order[1].atk_circ.circ)
     end
-    dead, fight_res = combat.target_dead(init_order[2])
-    if dead == true then
+    end_combat, fight_res = combat.turn_resolve(init_order[1],init_order[2])
+    if end_combat == true then
       break
     end
-    combat.end_turn (init_order[1])
     ui:message("-------------------")
     utility.sleep(1)
     ui:message(init_order[2].name.."'s turn")
@@ -140,11 +152,10 @@ function combat.fight(player, monster)
     else
     combat.attack(init_order[2], init_order[1], init_order[2].atk_circ.circ)
     end
-    dead,fight_res = combat.target_dead(init_order[1])
-    if dead == true then
+    end_combat,fight_res = combat.turn_resolve(init_order[2],init_order[1])
+    if end_combat == true then
       break
     end
-    combat.end_turn(init_order[2])
     ui:message("-------------------")
     utility.sleep(1)
   end

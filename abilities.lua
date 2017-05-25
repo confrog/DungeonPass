@@ -14,6 +14,7 @@ function abilities.Ability:new(o)
   return o
 end
 -- Warrior Abilities --
+--> level 1
 power_atk = abilities.Ability:new()
   power_atk.name = "Power Attack"
   power_atk.cd = 3
@@ -40,26 +41,44 @@ function power_atk:ability (player,target)
     self.cd_count = self.cd
   end
 end
---
+--> level 3
 second_wind = abilities.Ability:new()
   second_wind.name = "Second Wind"
   second_wind.cd = math.huge
 function second_wind:ability (player, target)
-  r = random.new(12345)
-  r:seed(os.time())
   if self.cd_count > 0 then
     ui:message("This ability is on cooldown. It cannot be used again in this combat.")
     combat.player_turn (player, target)
   else
-    heal_amt = r:value(1,10) + player.level
+    heal_amt = roll.basic_roll(10) + player.level
     player.hp = player.hp + heal_amt
     if player.hp > player.max_hp then
       player.hp = player.max_hp
+      ui:message("You take a moment to breath and regain your focus, watching your opponent's every move. You regain "..heal_amt.." hit points.")
+      self.cd_count = self.cd
     end
-    ui:message("You take a moment to breath and regain your focus, watching your opponent's every move. You regain "..heal_amt.." hit points.")
-    self.cd_count = self.cd
   end
 end
---
+--> level 6
+
+--> level 9
+
+-- Thief Abilities --
+--> level 1
+
+--> level 3
+
+--> level 6
+
+--> level 9
+
+-- Mage Abilities --
+--> level 1
+
+--> level 3
+
+--> level 6
+
+--> level 9
 --
 return abilities

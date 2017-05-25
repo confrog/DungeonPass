@@ -1,5 +1,5 @@
 ---------------------------------
--- Tile IDs --
+-- Tile Codes --
 --> 000 - Error
 --> 001 - In Camp
 --> 002 - In Graveyard
@@ -35,21 +35,21 @@ function game_start()
   return player
 end
 --
-function tile_loader (tile_id,tile_table, player)
+function tile_loader (code,tile_table, player)
   for k,v in ipairs(tile_table) do
-    if v.tile_code == tile_id then
-      next_id = v:load_tile(player)
-      return next_id
+    if v.tile_code == code then
+      next_code = v:load_tile(player)
+      return next_code
     end
   end
 end
 --
 function game_loop (tile_table)
   player = game_start()
-  tile_id = "001"
+  current_code = "001"
   while true do
-    next_id = tile_loader(tile_id,tile_table,player)
-    tile_id = next_id
+    next_code = tile_loader(current_code,tile_table,player)
+    current_code = next_code
   end
 end
 --
