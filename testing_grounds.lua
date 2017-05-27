@@ -39,7 +39,7 @@ test_room2 = tile.ExploreTile:new()
   local function option2(player)
     ui:message("You sit in the middle of the room, waiting for something to happen. A small rock falls from the ceiling and lands on your head. Ouch! You take 1 damage.")
     player.hp = player.hp - 1
-    test_room2:load_tile(player)
+    return false
   end
   test_room2.option_action = {option1, option2}
   test_room2.tile_code = "102"

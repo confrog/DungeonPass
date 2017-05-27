@@ -35,7 +35,7 @@ function combat.player_turn (player,monster)
             function()
               choices.choose(
                 "Which ability do you want to use?",
-                choices.iterFunc_opt2(player.abilities, player, monster)) 
+                choices.iterFunc_abil(player.abilities, player, monster)) 
             end))
         end,
       'Flee',

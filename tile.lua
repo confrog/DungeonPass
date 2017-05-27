@@ -20,6 +20,7 @@ end
 function tile.CombatTile:load_tile(player)
   ui:message(self.name)
   ui:message(self.tile_desc)
+  player.location = self.tile_code
   if self.is_complete == false then
     self.is_complete = combat.fight(player, self.monster)
     if player.fled == true then
@@ -27,9 +28,7 @@ function tile.CombatTile:load_tile(player)
       return "001"
     end
   else
-    r = random.new(12345)
-    r:seed(os.time())
-    if r:value(1,100) <= self.rspwn_chance then
+    if roll.basic_roll(100) <= self.rspwn_chance then
       ui:message("Another "..self.monster.name.." appeared!")
       combat.fight(player, self.monster)
     else
@@ -68,17 +67,19 @@ end
 function tile.ExploreTile:load_tile(player)
   ui:message(self.name)
   ui:message(self.tile_desc)
+  player.location = self.tile_code
   if self.is_complete == false then
     self.is_complete = choices.choose(
       "What do you do?",
-      choices.iterFunc_opt1(self.option_text,self.option_action,player))
+      choices.iterFunc_explore(self.option_text,self.option_action,player))
+    return self.tile_code
   else
      next_tile = choices.choose(
     "What do you want to do?",
     choices.options(
       "Continue forward",
       function()
-        return tile.ExploreTile.next_code
+        return self.next_code
       end,
       "Return to camp",
       function()

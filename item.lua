@@ -8,6 +8,15 @@ function item.Item:new(o)
   return o
 end
 --
+item.Flask = {name = "Flask", value = 0, max_fill = 1, item_type = "flask"}
+  item.Flask.uses = item.Flask.max_fill
+function item.Flask:new(o)
+  o = o or {}
+  setmetatable(o,self)
+  self.__index = self
+  return o
+end
+--
 item.Weapon = {name = nil, atk = 0, dmg = 0, value = 0, item_type = "weapon", prof_class = 0, equipped = false}
 function item.Weapon:new(o)
   o = o or {}
@@ -24,11 +33,22 @@ function item.Armor:new(o)
   return o
 end
 --
+item.Trinket = {name = nil, atk = 0, dmg = 0, defense = 0, item_type = "trinket", prof_class = 0, equipped = false}
+function item.Trinket:new(o)
+  o = o or {}
+  setmetatable(o,self)
+  self.__index = self
+  return o
+end
+--
+
 --> Item Library <--
+
 -- Items --
 s_rock = item.Item:new()
   s_rock.name = "Shiny Rock"
   s_rock.value = 5
+
 -- Weapons --
 unarmed = item.Weapon:new()
   unarmed.name = "Unarmed"
@@ -80,5 +100,10 @@ chainmail = item.Armor:new()
   chainmail.defense = 3
   chainmail.value = 25
   chainmail.prof_class = 2
+
+-- Trinkets --
+none = item.Trinket:new()
+  none.name = "None"
+
 --
 return item

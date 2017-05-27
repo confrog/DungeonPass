@@ -42,14 +42,14 @@ function choices.options(...)
    return opts
 end
 --
-function choices.iterFunc_opt1(...) -- for explore tiles
+function choices.iterFunc_explore(...) -- for explore tiles
   local opts = {}
   local input = {...}
   for i = 1, #input[1] do
     local option = {
         label = input[1][i];
         callback = function ()
-          input[2][i](input[3])
+          return input[2][i](input[3])
           end
         }
     table.insert(opts, option)
@@ -57,7 +57,7 @@ function choices.iterFunc_opt1(...) -- for explore tiles
   return opts
 end
 --
-function choices.iterFunc_opt2(...) -- for player abilities
+function choices.iterFunc_abil(...) -- for player abilities
   local opts = {}
   local input = {...}
   for i = 1, #input[1] do

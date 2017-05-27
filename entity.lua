@@ -14,13 +14,14 @@ entity.Player = {}
   entity.Player.hp_bonus = 0
   entity.Player.hp = entity.Player.max_hp
   entity.Player.inventory = {coins = 0}
-  entity.Player.equipped = {weapon = unarmed, armor = naked, trinket = nil}
-  entity.Player.atk = entity.Player.equipped.weapon.atk
-  entity.Player.dmg = entity.Player.equipped.weapon.dmg
-  entity.Player.defense = 10 + entity.Player.equipped.armor.defense
+  entity.Player.equipped = {weapon = unarmed, armor = naked, trinket = none}
+  entity.Player.atk = entity.Player.equipped.weapon.atk + entity.Player.equipped.trinket.atk
+  entity.Player.dmg = entity.Player.equipped.weapon.dmg + entity.Player.equipped.trinket.dmg
+  entity.Player.defense = 10 + entity.Player.equipped.armor.defense + entity.Player.equipped.trinket.defense
   entity.Player.atk_circ = {circ = nil, duration = 0}
   entity.Player.status = "alive"
   entity.Player.fled = false
+  entity.Player.location = nil
 function entity.Player:new(o)
   o = o or {}
   setmetatable(o,self)
@@ -35,9 +36,9 @@ function entity.Player:lose_hp(n)
   self.hp = self.hp - n
 end
 function entity.Player:equip_update()
-  self.atk = self.equipped.weapon.atk
-  self.dmg = self.equipped.weapon.dmg
-  self.defense = 10 + self.equipped.armor.defense
+  self.atk = self.equipped.weapon.atk + self.equipped.trinket.atk
+  self.dmg = self.equipped.weapon.dmg + self.equipped.trinket.dmg
+  self.defense = 10 + self.equipped.armor.defense + self.equipped.trinket.defense
 end
 function entity.Player:equip_item(item)  
   if item.item_type == "weapon" then
@@ -103,8 +104,8 @@ entity.Warrior = entity.Player:new()
   entity.Warrior.hp = entity.Warrior.max_hp
   entity.Warrior.hp_bonus = 2
   entity.Warrior.inventory = {longsword, merc_armor, coins = 0}
-  entity.Warrior.equipped = {weapon = longsword, armor = merc_armor, trinket = nil}
-  entity.Warrior.abilities = {power_atk, second_wind}
+  entity.Warrior.equipped = {weapon = longsword, armor = merc_armor, trinket = none}
+  entity.Warrior.abilities = {power_atk}
   entity.Warrior.equipped.weapon.equipped = true
   entity.Warrior.equipped.armor.equipped = true
 function entity.Warrior:new(o)
@@ -120,8 +121,8 @@ entity.Thief = entity.Player:new()
   entity.Thief.hp_bonus = 1
   entity.Thief.hp = entity.Thief.max_hp
   entity.Thief.inventory = {dirk, thief_armor, coins = 0}
-  entity.Thief.equipped = {weapon = dirk, armor = thief_armor, trinket = nil}
-  entity.Thief.abilities = {}
+  entity.Thief.equipped = {weapon = dirk, armor = thief_armor, trinket = none}
+  entity.Thief.abilities = {feint}
   entity.Thief.equipped.weapon.equipped = true
   entity.Thief.equipped.armor.equipped = true
 function entity.Thief:new(o)
@@ -136,8 +137,8 @@ entity.Mage = entity.Player:new()
   entity.Mage.max_hp = 8
   entity.Mage.hp = entity.Mage.max_hp
   entity.Mage.inventory = {staff, robes, coins = 0}
-  entity.Mage.equipped = {weapon = staff, armor = robes, trinket = nil}
-  entity.Mage.abilities = {}
+  entity.Mage.equipped = {weapon = staff, armor = robes, trinket = none}
+  entity.Mage.abilities = {arcane_bolt}
   entity.Mage.equipped.weapon.equipped = true
   entity.Mage.equipped.armor.equipped = true
 function entity.Mage:new(o)
